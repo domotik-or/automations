@@ -1,0 +1,20 @@
+[general]
+
+[mqtt]
+host = "localhost"
+port = 1883
+
+[mail]
+fromm = "fbarbenoire@gmail.com"
+to = "fbarbenoire@gmail.com"
+
+[smtp]
+host = "smtp.gmail.com"
+port = 587
+username = "fbarbenoire@gmail.com"
+password = "xsoyvdxitbxearpf"
+
+[[logger]]
+
+[logger.root]
+level = "DEBUG"

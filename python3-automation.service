@@ -1,0 +1,18 @@
+[Unit]
+Description=Linky
+StartLimitIntervalSec=300
+StartLimitBurst=5
+After=python3-domotik.service
+
+[Service]
+WorkingDirectory=/home/domotik/python3-automation
+Environment="PYTHONPATH=/home/domotik/python3-automation"
+ExecStart=/usr/bin/python3 /home/domotik/python3-automation/automation/main.py
+User=domotik
+Group=domotik
+Restart=on-failure
+RestartSec=10s
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target
