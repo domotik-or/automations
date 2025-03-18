@@ -26,17 +26,19 @@ _task_automation = None
 async def init():
     global _task_automation
 
-    # set log level of modules' loggers
-    for lg_name, lg_level in config.loggers.items():
-        if lg_name == "root":
-            logger.setLevel(lg_level)
-        else:
+    # set log level of modules logger
+    for lg_name, lg_config in config.loggers.items():
+        module_name = f"sail.{lg_name}"
+        try:
+            module = sys.modules[module_name]
+        except KeyError:
             try:
-                module = sys.modules[lg_name]
-            except KeyError:
-                logger.error(f"unknown module {lg_name}")
-            module_logger = getattr(module, "logger")
-            module_logger.setLevel(lg_level)
+                module = importlib.import_module(module_name)
+            except ModuleNotFoundError:
+                logger.warning(f"module {module_name} not found")
+                continue
+        module_logger = getattr(module, "logger")
+        module_logger.setLevel(lg_config.level)
 
 
 async def run(config_filename: str):

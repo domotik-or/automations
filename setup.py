@@ -10,8 +10,16 @@ setup(
 	author="Franck Barbenoire",
 	author_email="fbarbenoire@gmail.com",
 	url="https://github.com/franckinux/python3-automation",
-	packages=find_packages(),
+	packages=["automation"],
+    package_dir={"automation": "automation"},
 	include_package_data=True,
+    install_requires=[
+        "aiomqtt", "aiosmtplib", "tomli"
+    ],
+    entry_points={
+        "console_scripts": ["automation=automation.main:main", ]
+    },
+    python_requires='>=3.10',
 	zip_safe=False,
 	license="MIT"
 )
