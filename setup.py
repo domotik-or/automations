@@ -14,12 +14,12 @@ setup(
     package_dir={"automation": "automation"},
     include_package_data=True,
     install_requires=[
-        "aiomqtt", "aiosmtplib", "tomli"
+        "aiomqtt", "aiosmtplib"
     ],
     entry_points={
         "console_scripts": ["automation=automation.main:main", ]
     },
-    python_requires='>=3.10',
+    python_requires='>=3.11',
     zip_safe=False,
     license="MIT"
 )

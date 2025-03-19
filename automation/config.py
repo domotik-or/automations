@@ -1,7 +1,6 @@
 import logging
 from pathlib import Path
-
-import tomli
+import tomllib
 
 from automation.typem import GeneralConfig
 from automation.typem import MailConfig
@@ -34,7 +33,7 @@ def parse_log_config(data: dict):
 def read(config_filename: str):
     config_file = Path(config_filename)
     with open(config_file, "rb") as f:
-        raw_config = tomli.load(f)
+        raw_config = tomllib.load(f)
 
     global general
     general = GeneralConfig(**raw_config["general"])
