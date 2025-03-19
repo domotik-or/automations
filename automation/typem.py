@@ -7,12 +7,6 @@ class GeneralConfig:
 
 
 @dataclass
-class MailConfig:
-    fromm: str
-    to: str
-
-
-@dataclass
 class MqttConfig:
     host: str
     port: int
@@ -22,5 +16,3 @@ class MqttConfig:
 class SmtpConfig:
     host: str
     port: int
-    username: str
-    password: str

@@ -2,16 +2,15 @@
 
 import argparse
 import asyncio
+from dataclasses import dataclass
 import importlib
 import logging
 import sys
 
 from aiomqtt import Client
-from email.message import EmailMessage
 import aiosmtplib
-from dotenv import load_dotenv as dotenv_load
-from dotenv import has as dotenv_has
-from dotenv import all as dotenv_all
+from dotenv import DotEnv
+from email.message import EmailMessage
 
 import automation.config as config
 
@@ -22,12 +21,9 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
-@dataclass
+
 class Secrets:
-    smtp_username: str
-    smtp_password: str
-    mail_from: str
-    mail_to: str
+    pass
 
 
 async def init():
@@ -84,9 +80,9 @@ def main():
     args = parser.parse_args()
 
     # get secrets
-    dotenv_load()
-    if not dotenv_has("MAIL_FROM") or not dotenv_has("MAIL_TO") or \
-            not dotenv_has("SMTP_USERNAME") or not dotenv_has("SMTP_PASSWORD"):
+    dotenv = DotEnv()
+    if not dotenv.has("MAIL_FROM") or not dotenv.has("MAIL_TO") or \
+            not dotenv.has("SMTP_USERNAME") or not dotenv.has("SMTP_PASSWORD"):
         sys.stderr.write(
             "Please define environment variables MAIL_FROM, MAIL_TO, "
             "SMTP_USERNAME and SMTP_PASSWORD either by hand, in an init script "
@@ -94,7 +90,11 @@ def main():
         )
         sys.exit(1)
 
-    secrets = Secrets(**dotenv_all())
+    # store secrets in memory
+    env_secrets = dotenv.all()
+    secrets = Secrets()
+    for k, v in env_secrets.items():
+        setattr(secrets, k.lower(), v)
 
     loop = asyncio.get_event_loop()
     try:

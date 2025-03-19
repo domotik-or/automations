@@ -4,15 +4,9 @@
 host = "localhost"
 port = 1883
 
-[mail]
-fromm = "first.last.name@gmail.com"
-to = "first.last.name@gmail.com"
-
 [smtp]
 host = "smtp.gmail.com"
 port = 587
-username = "first.last.name@gmail.com"
-password = "x"
 
 [[logger]]
 
