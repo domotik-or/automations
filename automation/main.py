@@ -20,12 +20,9 @@ logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
 _running = True
-_task_automation = None
 
 
 async def init():
-    global _task_automation
-
     # set log level of modules logger
     for lg_name, lg_config in config.loggers.items():
         module_name = f"sail.{lg_name}"
@@ -87,7 +84,6 @@ def main():
         # loop.run_until_complete(close())
         loop.stop()
         logger.info("done")
-    pass
 
 
 if __name__ == "__main__":

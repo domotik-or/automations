@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 
-from setuptools import setup, find_packages
+from setuptools import setup
 
 
 setup(
-	name="python3-automation",
-	version="0.1.0",
-	description="Simulate an automation system",
-	author="Franck Barbenoire",
-	author_email="fbarbenoire@gmail.com",
-	url="https://github.com/franckinux/python3-automation",
-	packages=["automation"],
+    name="python3-automation",
+    version="0.1.0",
+    description="Simulate an automation system",
+    author="Franck Barbenoire",
+    author_email="fbarbenoire@gmail.com",
+    url="https://github.com/franckinux/python3-automation",
+    packages=["automation"],
     package_dir={"automation": "automation"},
-	include_package_data=True,
+    include_package_data=True,
     install_requires=[
         "aiomqtt", "aiosmtplib", "tomli"
     ],
@@ -20,8 +20,8 @@ setup(
         "console_scripts": ["automation=automation.main:main", ]
     },
     python_requires='>=3.10',
-	zip_safe=False,
-	license="MIT"
+    zip_safe=False,
+    license="MIT"
 )
 
 # http://python-packaging.readthedocs.io/en/latest/command-line-scripts.html
