@@ -3,14 +3,12 @@ from pathlib import Path
 import tomllib
 
 from automation.typem import GeneralConfig
-from automation.typem import MailConfig
 from automation.typem import MqttConfig
 from automation.typem import SmtpConfig
 
 loggers = {}
 
 general = None
-mail = None
 mqtt = None
 smtp = None
 
@@ -40,9 +38,6 @@ def read(config_filename: str):
 
     global loggers
     parse_log_config(raw_config["logger"][0])
-
-    global mail
-    mail = MailConfig(**raw_config["mail"])
 
     global mqtt
     mqtt = MqttConfig(**raw_config["mqtt"])
