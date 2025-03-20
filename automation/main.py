@@ -2,14 +2,14 @@
 
 import argparse
 import asyncio
-from dataclasses import dataclass
 import importlib
 import logging
+from os import getenv
 import sys
 
 from aiomqtt import Client
 import aiosmtplib
-from dotenv import DotEnv
+from dotenv import load_dotenv
 from email.message import EmailMessage
 
 import automation.config as config
@@ -79,22 +79,15 @@ def main():
     parser.add_argument("-c", "--config", default="config.toml")
     args = parser.parse_args()
 
-    # get secrets
-    dotenv = DotEnv()
-    if not dotenv.has("MAIL_FROM") or not dotenv.has("MAIL_TO") or \
-            not dotenv.has("SMTP_USERNAME") or not dotenv.has("SMTP_PASSWORD"):
-        sys.stderr.write(
-            "Please define environment variables MAIL_FROM, MAIL_TO, "
-            "SMTP_USERNAME and SMTP_PASSWORD either by hand, in an init script "
-            "(bashrc or other) or in the .env file.\n"
-        )
-        sys.exit(1)
-
     # store secrets in memory
-    env_secrets = dotenv.all()
+    load_dotenv()
     secrets = Secrets()
-    for k, v in env_secrets.items():
-        setattr(secrets, k.lower(), v)
+    for v in ("MAIL_FROM", "MAIL_TO", "SMTP_USERNAME", "SMTP_PASSWORD"):
+        value = getenv(v)
+        if value is None:
+            sys.stderr.write(f"Missing environment variable {v}\n")
+            sys.exit(1)
+        setattr(secrets, v.lower(), value)
 
     loop = asyncio.get_event_loop()
     try:

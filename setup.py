@@ -14,7 +14,7 @@ setup(
     package_dir={"automation": "automation"},
     include_package_data=True,
     install_requires=[
-        "aiomqtt", "aiosmtplib", "dotenv-python"
+        "aiomqtt", "aiosmtplib", "python-dotenv"
     ],
     entry_points={
         "console_scripts": ["automation=automation.main:main", ]
