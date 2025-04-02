@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import argparse
 import asyncio
 import importlib
 import logging
@@ -12,7 +11,7 @@ import aiosmtplib
 from dotenv import load_dotenv
 from email.message import EmailMessage
 
-import automation.config as config
+import src.config as config
 
 logger = logging.getLogger()
 handler = logging.StreamHandler(stream=sys.stdout)
@@ -29,7 +28,7 @@ class Secrets:
 async def init():
     # set log level of modules logger
     for lg_name, lg_config in config.loggers.items():
-        module_name = f"sail.{lg_name}"
+        module_name = f"src.{lg_name}"
         try:
             module = sys.modules[module_name]
         except KeyError:
@@ -75,6 +74,8 @@ async def run(config_filename: str, secrets):
 
 
 def main():
+    import argparse
+
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--config", default="config.toml")
     args = parser.parse_args()

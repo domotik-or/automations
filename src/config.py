@@ -2,9 +2,10 @@ import logging
 from pathlib import Path
 import tomllib
 
-from automation.typem import GeneralConfig
-from automation.typem import MqttConfig
-from automation.typem import SmtpConfig
+from src.typem import GeneralConfig
+from src.typem import LoggerConfig
+from src.typem import MqttConfig
+from src.typem import SmtpConfig
 
 loggers = {}
 
@@ -13,19 +14,6 @@ mqtt = None
 smtp = None
 
 _module = []
-
-
-def parse_log_config(data: dict):
-    global loggers
-    global _module
-
-    for k, v in data.items():
-        _module.append(k)
-        try:
-            loggers[".".join(_module)] = getattr(logging, v["level"])
-            _module.pop()
-        except KeyError:
-            parse_log_config(v)
 
 
 def read(config_filename: str):
@@ -37,7 +25,11 @@ def read(config_filename: str):
     general = GeneralConfig(**raw_config["general"])
 
     global loggers
-    parse_log_config(raw_config["logger"][0])
+    for lg in raw_config["logger"]:
+        level_str = raw_config["logger"][lg]["level"]
+        level = getattr(logging, level_str)
+        loggers[lg] = LoggerConfig(level)
+
 
     global mqtt
     mqtt = MqttConfig(**raw_config["mqtt"])
