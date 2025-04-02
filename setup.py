@@ -11,7 +11,7 @@ setup(
     author_email="fbarbenoire@gmail.com",
     url="https://github.com/franckinux/python3-automation",
     packages=["automation"],
-    package_dir={"automation": "automation"},
+    package_dir={"automation": "src"},
     include_package_data=True,
     install_requires=[
         "aiomqtt", "aiosmtplib", "python-dotenv"

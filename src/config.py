@@ -2,10 +2,10 @@ import logging
 from pathlib import Path
 import tomllib
 
-from src.typem import GeneralConfig
-from src.typem import LoggerConfig
-from src.typem import MqttConfig
-from src.typem import SmtpConfig
+from typem import GeneralConfig
+from typem import LoggerConfig
+from typem import MqttConfig
+from typem import SmtpConfig
 
 loggers = {}
 

@@ -11,7 +11,7 @@ import aiosmtplib
 from dotenv import load_dotenv
 from email.message import EmailMessage
 
-import src.config as config
+import config
 
 logger = logging.getLogger()
 handler = logging.StreamHandler(stream=sys.stdout)
