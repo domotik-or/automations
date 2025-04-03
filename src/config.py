@@ -26,7 +26,7 @@ def read(config_filename: str):
 
     global loggers
     for lg in raw_config["logger"]:
-        level_str = raw_config["logger"][lg]["level"]
+        level_str = raw_config["logger"][lg]
         level = getattr(logging, level_str)
         loggers[lg] = LoggerConfig(level)
 

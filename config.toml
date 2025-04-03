@@ -9,6 +9,4 @@ host = "smtp.gmail.com"
 port = 587
 
 [logger]
-
-[logger.acme]
-level = "DEBUG"
+acme = "DEBUG"
