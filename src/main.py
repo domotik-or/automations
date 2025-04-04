@@ -3,12 +3,11 @@
 import asyncio
 import importlib
 import logging
-from os import getenv
 import sys
 
+import aiohttp
 from aiomqtt import Client
 import aiosmtplib
-from dotenv import load_dotenv
 from email.message import EmailMessage
 
 import config
@@ -19,10 +18,6 @@ formatter = logging.Formatter("%(asctime)s %(module)s %(levelname)s %(message)s"
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
-
-
-class Secrets:
-    pass
 
 
 async def init():
@@ -41,22 +36,18 @@ async def init():
         module_logger.setLevel(lg_config.level)
 
 
-async def run(config_filename: str, secrets):
-    config.read(config_filename)
-
-    await init()
-
+async def _task_doorbell():
     logger.info("started")
     try:
-        async with Client(config.mqtt.host, config.mqtt.port) as client:
+        async with Client(config.mqtt.hostname, config.mqtt.port) as client:
             await client.subscribe("home/doorbell/button")
             async for message in client.messages:
                 if message.payload.decode() == "pressed":
                     await client.publish("home/doorbell/bell")
 
                     message = EmailMessage()
-                    message["From"] = secrets.mail_from,
-                    message["To"] = secrets.mail_to
+                    message["From"] = config.secrets.mail_from,
+                    message["To"] = config.secrets.mail_to
                     message["Subject"] = "Ding dong !"
                     message.set_content("On sonne à la porte")
                     try:
@@ -64,13 +55,37 @@ async def run(config_filename: str, secrets):
                             message,
                             hostname=config.smtp.host,
                             port=config.smtp.port,
-                            username=secrets.smtp_username,
-                            password=secrets.smtp_password
+                            username=config.secrets.smtp_username,
+                            password=config.secrets.smtp_password
                         )
                     except Exception as exc:
                         logger.error(f"{exc}")
     except KeyboardInterrupt:
         return
+
+
+async def _task_pressure():
+    while True:
+        async with aiohttp.ClientSession() as session:
+            url = f"http://{config.domotik.hostname}:{config.domotik.port}/pressure"
+            async with session.get(url) as resp:
+                if resp.status == 200:
+                    json = await resp.json()
+                    pressure = json["data"]["pressure"]
+                    logger.debug(f"pressure: {pressure}")
+                else:
+                    logger.debug(f"bad status ({resp.status}) when getting pressure")
+
+        await asyncio.sleep(60)
+
+
+async def run(config_filename: str, secrets):
+    config.read(config_filename)
+
+    await init()
+
+    asyncio.create_task(_task_doorbell())
+    asyncio.create_task(_task_pressure())
 
 
 def main():
@@ -80,19 +95,10 @@ def main():
     parser.add_argument("-c", "--config", default="config.toml")
     args = parser.parse_args()
 
-    # store secrets in memory
-    load_dotenv()
-    secrets = Secrets()
-    for v in ("MAIL_FROM", "MAIL_TO", "SMTP_USERNAME", "SMTP_PASSWORD"):
-        value = getenv(v)
-        if value is None:
-            sys.stderr.write(f"Missing environment variable {v}\n")
-            sys.exit(1)
-        setattr(secrets, v.lower(), value)
-
-    loop = asyncio.get_event_loop()
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     try:
-        loop.run_until_complete(run(args.config, secrets))
+        loop.run_until_complete(run(args.configs))
     except KeyboardInterrupt:
         pass
     finally:

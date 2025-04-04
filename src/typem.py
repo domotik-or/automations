@@ -2,6 +2,12 @@ from dataclasses import dataclass
 
 
 @dataclass
+class DomotikConfig:
+    hostname: str
+    port: int
+
+
+@dataclass
 class GeneralConfig:
     pass
 
@@ -13,11 +19,16 @@ class LoggerConfig:
 
 @dataclass
 class MqttConfig:
-    host: str
+    hostname: str
     port: int
 
 
 @dataclass
+class SecretsConfig:
+    pass
+
+
+@dataclass
 class SmtpConfig:
-    host: str
+    hostname: str
     port: int

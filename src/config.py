@@ -1,19 +1,29 @@
 import logging
+from os import getenv
 from pathlib import Path
+import sys
 import tomllib
 
+from dotenv import load_dotenv
+
+from typem import DomotikConfig
 from typem import GeneralConfig
 from typem import LoggerConfig
 from typem import MqttConfig
+from typem import SecretsConfig
 from typem import SmtpConfig
 
-loggers = {}
 
+domotik = None
 general = None
+loggers = {}
 mqtt = None
+secrets = None
 smtp = None
 
-_module = []
+
+class Secrets:
+    pass
 
 
 def read(config_filename: str):
@@ -30,9 +40,21 @@ def read(config_filename: str):
         level = getattr(logging, level_str)
         loggers[lg] = LoggerConfig(level)
 
+    global domotik
+    domotik = DomotikConfig(**raw_config["domotik"])
 
     global mqtt
     mqtt = MqttConfig(**raw_config["mqtt"])
 
     global smtp
     smtp = SmtpConfig(**raw_config["smtp"])
+
+    # store secrets in memory
+    load_dotenv()
+    secrets = SecretsConfig()
+    for v in ("MAIL_FROM", "MAIL_TO", "SMTP_USERNAME", "SMTP_PASSWORD"):
+        value = getenv(v)
+        if value is None:
+            sys.stderr.write(f"Missing environment variable {v}\n")
+            sys.exit(1)
+        setattr(secrets, v.lower(), value)
