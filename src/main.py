@@ -6,13 +6,8 @@ import logging
 import signal
 import sys
 
-import aiohttp
-from aiomqtt import Client
-import aiosmtplib
-from email.message import EmailMessage
-
 import config
-import tasks
+import automations
 
 logger = logging.getLogger()
 handler = logging.StreamHandler(stream=sys.stdout)
@@ -38,7 +33,7 @@ async def init():
         module_logger = getattr(module, "logger")
         module_logger.setLevel(lg_config.level)
 
-    tasks.init()
+    automations.init()
 
 
 async def run(config_filename: str):
@@ -51,7 +46,7 @@ async def run(config_filename: str):
 
 
 async def close():
-    await tasks.close()
+    await automations.close()
 
 
 def sigterm_handler(_signo, _stack_frame):

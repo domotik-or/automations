@@ -23,8 +23,7 @@ class MqttConfig:
     port: int
 
 
-@dataclass
-class SecretsConfig:
+class SecretDataConfig:
     pass
 
 
