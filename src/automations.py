@@ -55,11 +55,11 @@ async def _task_mqtt():
         await client.subscribe("zigbee2mqtt/sensor/#")
         try:
             async for message in client.messages:
-                # logger.debug(
-                #     f"mqtt message, topic: {message.topic.value}, "
-                #     f"payload: {message.payload}"
-                # )
-                if message.topic.matches("zigbee2mqtt/sensor/sonoff/snzb-02p/#"):
+                logger.debug(
+                    f"mqtt message, topic: {message.topic.value}, "
+                    f"payload: {message.payload}"
+                )
+                if message.topic.matches("zigbee2mqtt/sensor/sonoff/snzb02p/#"):
                     payload = json.loads(message.payload.decode())
                     location = message.topic.value.split('/')[-1]
                     logger.debug(f"location: {location}, payload: {payload}")
