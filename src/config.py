@@ -10,6 +10,7 @@ from typem import DomotikConfig
 from typem import GeneralConfig
 from typem import LoggerConfig
 from typem import MqttConfig
+from typem import PostgresqlConfig
 from typem import SecretDataConfig
 from typem import SmtpConfig
 
@@ -18,6 +19,7 @@ domotik = None
 general = None
 loggers = {}
 mqtt = None
+postgresql = None
 secret_data = None
 smtp = None
 
@@ -46,6 +48,9 @@ def read(config_filename: str):
     global mqtt
     mqtt = MqttConfig(**raw_config["mqtt"])
 
+    global postgresql
+    postgresql = PostgresqlConfig(**raw_config["postgresql"])
+
     global smtp
     smtp = SmtpConfig(**raw_config["smtp"])
 
@@ -53,7 +58,9 @@ def read(config_filename: str):
     global secret_data
     load_dotenv()
     secret_data = SecretDataConfig()
-    for v in ("MAIL_FROM", "MAIL_TO", "SMTP_USERNAME", "SMTP_PASSWORD"):
+    for v in (
+        "MAIL_FROM", "MAIL_TO", "PGPASSWORD", "SMTP_USERNAME", "SMTP_PASSWORD"
+    ):
         value = getenv(v)
         if value is None:
             sys.stderr.write(f"Missing environment variable {v}\n")

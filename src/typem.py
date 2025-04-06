@@ -23,6 +23,14 @@ class MqttConfig:
     port: int
 
 
+@dataclass
+class PostgresqlConfig:
+    hostname: str
+    port: int
+    username: str
+    databasename: str
+
+
 class SecretDataConfig:
     pass
 

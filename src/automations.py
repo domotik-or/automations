@@ -6,8 +6,10 @@ import aiohttp
 import aiomqtt
 import aiosmtplib
 from email.message import EmailMessage
+from paho.mqtt.subscribeoptions import SubscribeOptions
 
 import config
+from db import execute_query
 
 _running = False
 _linky_task = None
@@ -20,8 +22,10 @@ logger.setLevel(logging.INFO)
 
 
 def init():
-    global _running
+    global _linky_task
+    global _mqtt_task
     global _pressure_task
+    global _running
 
     _running = True
     _linky_task = asyncio.create_task(_task_linky())
@@ -50,8 +54,11 @@ async def send_email(subject: str, content: str):
 async def _task_mqtt():
     logger.debug("mqtt task started")
 
-    async with aiomqtt.Client(config.mqtt.hostname, config.mqtt.port) as client:
-        await client.subscribe("home/#")
+    async with aiomqtt.Client(
+        config.mqtt.hostname, config.mqtt.port, protocol=aiomqtt.ProtocolVersion.V5
+    ) as client:
+        options = SubscribeOptions(qos=1, noLocal=True)
+        await client.subscribe("home/#", options=options)
         await client.subscribe("zigbee2mqtt/sensor/#")
         try:
             async for message in client.messages:
@@ -61,13 +68,25 @@ async def _task_mqtt():
                 )
                 if message.topic.matches("zigbee2mqtt/sensor/sonoff/snzb02p/#"):
                     payload = json.loads(message.payload.decode())
-                    location = message.topic.value.split('/')[-1]
-                    logger.debug(f"location: {location}, payload: {payload}")
+                    device = message.topic.value.split('/')[-1]
+
+                    # store values in db
+                    await execute_query(
+                        "INSERT INTO sonoff_snzb02p VALUES ($1, $2, $3)",
+                        device, payload["humidity"], payload["temperature"]
+                    )
+
                     if payload["battery"] < 50:
                         logger.warning(f"{message.topic.value}: battery low")
                 elif message.topic.matches("home/doorbell/pressed"):
                     await client.publish("home/doorbell/ring")
                     await send_email("Ding dong !", "On sonne à la porte")
+
+                    # store event in db
+                    await execute_query(
+                        "INSERT INTO on_off VALUES ($1, $2)", "doorbell", True
+                    )
+
         except (asyncio.CancelledError, KeyboardInterrupt):
             pass
 
@@ -89,8 +108,12 @@ async def _task_linky():
                     async with session.get(url) as resp:
                         if resp.status == 200:
                             json = await resp.json()
-                            east = json["data"]["east"]
-                            logger.debug(f"east: {east}")
+
+                            # store values in db
+                            await execute_query(
+                                "INSERT INTO linky VALUES ($1, $2)",
+                                json["data"]["east"], json["data"]["sinsts"]
+                            )
                         else:
                             logger.debug(f"bad status ({resp.status}) when getting linky")
 
@@ -118,7 +141,11 @@ async def _task_pressure():
                             json = await resp.json()
                             pressure = json["data"]["pressure"]
                             pressure /= 100.0
-                            logger.debug(f"pressure: {pressure:.2f}")
+
+                            # store values in db
+                            await execute_query(
+                                "INSERT INTO pressure VALUES ($1)", pressure
+                            )
                         else:
                             logger.debug(f"bad status ({resp.status}) when getting pressure")
 

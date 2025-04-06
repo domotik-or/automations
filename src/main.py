@@ -7,6 +7,7 @@ import signal
 import sys
 
 import config
+import db
 import automations
 
 logger = logging.getLogger()
@@ -33,6 +34,7 @@ async def init():
         module_logger = getattr(module, "logger")
         module_logger.setLevel(lg_config.level)
 
+    await db.init()
     automations.init()
 
 
@@ -47,6 +49,7 @@ async def run(config_filename: str):
 
 async def close():
     await automations.close()
+    await db.close()
 
 
 def sigterm_handler(_signo, _stack_frame):

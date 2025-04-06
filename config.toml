@@ -13,4 +13,10 @@ hostname = "smtp.gmail.com"
 port = 587
 
 [logger]
-automations = "DEBUG"
+automations = "INFO"
+
+[postgresql]
+hostname = "localhost"
+port = 5432
+username = "domotik"
+databasename = "domotiq"
