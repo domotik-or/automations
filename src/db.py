@@ -32,7 +32,7 @@ async def close_db():
     global _db_pool
 
     if _db_pool is not None:
-        _db_pool.close()
+        await _db_pool.close()
         _db_pool = None
 
 
