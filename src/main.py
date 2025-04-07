@@ -19,20 +19,16 @@ logger.setLevel(logging.DEBUG)
 
 
 async def init():
-    logging.getLogger("aiohttp").setLevel(logging.WARNING)
-
     # set log level of modules logger
     for lg_name, lg_config in config.loggers.items():
         try:
-            module = sys.modules[lg_name]
-        except KeyError:
-            try:
-                module = importlib.import_module(lg_name)
-            except ModuleNotFoundError:
-                logger.warning(f"module {lg_name} not found")
-                continue
-        module_logger = getattr(module, "logger")
-        module_logger.setLevel(lg_config.level)
+            importlib.import_module(lg_name)
+        except ModuleNotFoundError:
+            logger.warning(f"module {lg_name} not found")
+            continue
+
+        if lg_name in logging.Logger.manager.loggerDict.keys():
+            logging.getLogger(lg_name).setLevel(lg_config.level)
 
     await db.init()
     automations.init()
