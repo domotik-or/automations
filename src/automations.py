@@ -1,4 +1,5 @@
 import asyncio
+from time import perf_counter
 import json
 import logging
 
@@ -96,12 +97,11 @@ async def _task_mqtt():
 async def _task_linky():
     logger.debug("linky task started")
 
-    count = 0
+    start_time = perf_counter()
     try:
         while _running:
-            count += 1
-            if count == 15:
-                count = 0
+            if perf_counter() - start_time >= 15:
+                start_time = perf_counter()
 
                 async with aiohttp.ClientSession() as session:
                     url = f"http://{config.domotik.hostname}:{config.domotik.port}/linky"
@@ -127,12 +127,11 @@ async def _task_linky():
 async def _task_pressure():
     logger.debug("pressure task started")
 
-    count = 0
+    start_time = perf_counter()
     try:
         while _running:
-            count += 1
-            if count == 60:
-                count = 0
+            if perf_counter() - start_time >= 600:
+                start_time = perf_counter()
 
                 async with aiohttp.ClientSession() as session:
                     url = f"http://{config.domotik.hostname}:{config.domotik.port}/pressure"
@@ -140,7 +139,7 @@ async def _task_pressure():
                         if resp.status == 200:
                             json = await resp.json()
                             pressure = json["data"]["pressure"]
-                            pressure /= 100.0
+                            pressure /= 100.0  # convert to hPa
 
                             # store values in db
                             await execute_query(
