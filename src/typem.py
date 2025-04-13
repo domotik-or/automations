@@ -24,6 +24,12 @@ class MqttConfig:
 
 
 @dataclass
+class PeriodicityConfig:
+    linky: int
+    pressure: int
+
+
+@dataclass
 class PostgresqlConfig:
     hostname: str
     port: int

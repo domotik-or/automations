@@ -100,7 +100,7 @@ async def _task_linky():
     start_time = perf_counter()
     try:
         while _running:
-            if perf_counter() - start_time >= 15:
+            if perf_counter() - start_time >= config.periodicity.linky:
                 start_time = perf_counter()
 
                 async with aiohttp.ClientSession() as session:
@@ -130,7 +130,7 @@ async def _task_pressure():
     start_time = perf_counter()
     try:
         while _running:
-            if perf_counter() - start_time >= 600:
+            if perf_counter() - start_time >= config.periodicity.pressure:
                 start_time = perf_counter()
 
                 async with aiohttp.ClientSession() as session:

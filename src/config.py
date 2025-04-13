@@ -10,6 +10,7 @@ from typem import DomotikConfig
 from typem import GeneralConfig
 from typem import LoggerConfig
 from typem import MqttConfig
+from typem import PeriodicityConfig
 from typem import PostgresqlConfig
 from typem import SecretDataConfig
 from typem import SmtpConfig
@@ -19,6 +20,7 @@ domotik = None
 general = None
 loggers = {}
 mqtt = None
+periodicity = None
 postgresql = None
 secret_data = None
 smtp = None
@@ -47,6 +49,9 @@ def read(config_filename: str):
 
     global mqtt
     mqtt = MqttConfig(**raw_config["mqtt"])
+
+    global periodicity
+    periodicity = PeriodicityConfig(**raw_config["periodicity"])
 
     global postgresql
     postgresql = PostgresqlConfig(**raw_config["postgresql"])

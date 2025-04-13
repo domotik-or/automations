@@ -21,3 +21,7 @@ hostname = "localhost"
 port = 5432
 username = "domotik"
 databasename = "domotiq"
+
+[periodicity]
+pressure = 600
+linky = 60
