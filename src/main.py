@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import asyncio
 import importlib
 import logging
@@ -53,9 +54,7 @@ def sigterm_handler(_signo, _stack_frame):
     sys.exit(0)
 
 
-def main():
-    import argparse
-
+if __name__ == "__main__":
     signal.signal(signal.SIGTERM, sigterm_handler)
 
     parser = argparse.ArgumentParser()
@@ -72,7 +71,3 @@ def main():
         loop.run_until_complete(close())
         loop.stop()
         logger.info("done")
-
-
-if __name__ == "__main__":
-    main()
