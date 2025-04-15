@@ -4,12 +4,12 @@ from setuptools import setup
 
 
 setup(
-    name="python3-automation",
+    name="automations",
     version="0.1.0",
     description="Simulate an automation system",
     author="Franck Barbenoire",
     author_email="fbarbenoire@gmail.com",
-    url="https://github.com/franckinux/python3-automation",
+    url="https://github.com/domotik-or/automations",
     packages=["automation"],
     package_dir={"automation": "src"},
     include_package_data=True,
@@ -17,7 +17,7 @@ setup(
         "aiohttp", "aiomqtt", "aiosmtplib", "asyncpg", "python-dotenv"
     ],
     entry_points={
-        "console_scripts": ["automation=automation.main:main", ]
+        "console_scripts": ["automation=src.main:main", ]
     },
     python_requires='>=3.11',
     zip_safe=False,
