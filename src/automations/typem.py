@@ -32,7 +32,7 @@ class PostgresqlConfig:
     databasename: str
 
 
-class SecretDataConfig:
+class SecretsConfig:
     pass
 
 

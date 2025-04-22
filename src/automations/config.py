@@ -11,7 +11,7 @@ from automations.typem import GeneralConfig
 from automations.typem import MqttConfig
 from automations.typem import PeriodicityConfig
 from automations.typem import PostgresqlConfig
-from automations.typem import SecretDataConfig
+from automations.typem import SecretsConfig
 from automations.typem import SmtpConfig
 
 domotik = None
@@ -54,7 +54,7 @@ def read(config_filename: str):
     # store secrets in memory
     global secret_data
     load_dotenv(general.dotenv_filename)
-    secret_data = SecretDataConfig()
+    secret_data = SecretsConfig()
     for v in (
         "MAIL_FROM", "MAIL_TO", "PGPASSWORD", "SMTP_USERNAME", "SMTP_PASSWORD"
     ):
