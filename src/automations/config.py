@@ -6,15 +6,13 @@ import tomllib
 
 from dotenv import load_dotenv
 
-from typem import DomotikConfig
-from typem import GeneralConfig
-from typem import LoggerConfig
-from typem import MqttConfig
-from typem import PeriodicityConfig
-from typem import PostgresqlConfig
-from typem import SecretDataConfig
-from typem import SmtpConfig
-
+from automations.typem import DomotikConfig
+from automations.typem import GeneralConfig
+from automations.typem import MqttConfig
+from automations.typem import PeriodicityConfig
+from automations.typem import PostgresqlConfig
+from automations.typem import SecretDataConfig
+from automations.typem import SmtpConfig
 
 domotik = None
 general = None
@@ -26,26 +24,20 @@ secret_data = None
 smtp = None
 
 
-class Secrets:
-    pass
-
-
 def read(config_filename: str):
-    config_file = Path(config_filename)
+    config_file = Path(config_filename).expanduser()
+
     with open(config_file, "rb") as f:
         raw_config = tomllib.load(f)
 
     global general
     general = GeneralConfig(**raw_config["general"])
 
-    global loggers
-    for lg in raw_config["logger"]:
-        level_str = raw_config["logger"][lg]
-        level = getattr(logging, level_str)
-        loggers[lg] = LoggerConfig(level)
-
     global domotik
     domotik = DomotikConfig(**raw_config["domotik"])
+
+    global loggers
+    loggers = raw_config["logger"]
 
     global mqtt
     mqtt = MqttConfig(**raw_config["mqtt"])
@@ -61,7 +53,7 @@ def read(config_filename: str):
 
     # store secrets in memory
     global secret_data
-    load_dotenv()
+    load_dotenv(general.dotenv_filename)
     secret_data = SecretDataConfig()
     for v in (
         "MAIL_FROM", "MAIL_TO", "PGPASSWORD", "SMTP_USERNAME", "SMTP_PASSWORD"

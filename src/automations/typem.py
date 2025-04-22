@@ -9,12 +9,7 @@ class DomotikConfig:
 
 @dataclass
 class GeneralConfig:
-    pass
-
-
-@dataclass
-class LoggerConfig:
-    level: int
+    dotenv_filename: str
 
 
 @dataclass

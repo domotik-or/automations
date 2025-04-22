@@ -1,4 +1,5 @@
 [general]
+dotenv_filename = "/home/domotik/.config/domotik/automations.env"
 
 [mqtt]
 hostname = "localhost"
@@ -14,6 +15,8 @@ port = 587
 
 [logger]
 aiohttp = "WARNING"
+
+[logger.automations]
 automations = "INFO"
 
 [postgresql]

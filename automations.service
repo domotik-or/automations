@@ -5,9 +5,9 @@ StartLimitBurst=5
 After=python3-domotik.service
 
 [Service]
-WorkingDirectory=/home/domotik/automations
-Environment="PYTHONPATH=/home/domotik/automations"
-ExecStart=/usr/bin/python3 /home/domotik/automations/src/main.py
+WorkingDirectory=/home/domotik
+# Environment="PYTHONPATH="
+ExecStart=/home/domotik/.local/bin/automations -c /home/domotik/.config/domotik/automations.toml
 User=domotik
 Group=domotik
 Restart=on-failure

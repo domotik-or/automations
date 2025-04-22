@@ -1,0 +1,38 @@
+[project]
+name = "automations"
+dynamic = ["version"]
+description = "Home automations."
+authors = [{ name = "Franck Barbenoire", email = "fbarbenoire@gmail.com" }]
+readme = "README.rst"
+requires-python = ">=3.11"
+dependencies = [
+    "aiohttp==3.11.16",
+    "aiomqtt==2.3.1",
+    "aiosmtplib-4.0.0",
+    "asyncpg==0.30.0",
+    "python-dotenv==1.1.0"
+]
+license = "GPL-3.0-or-later"
+keywords = ["home automation", "automations"]
+
+[project.urls]
+Homepage = "https://github.com/domotik-or/automations"
+
+[build-system]
+requires = ["setuptools>=75.0"]
+build-backend = "setuptools.build_meta"
+
+[project.scripts]
+automations = "automations.main:main"
+
+[tool.mypy]
+python_version = 3.11
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.dynamic]
+version = {attr = "automations.main.__version__"}

@@ -9,8 +9,8 @@ import aiosmtplib
 from email.message import EmailMessage
 from paho.mqtt.subscribeoptions import SubscribeOptions
 
-import config
-from db import execute_query
+import automations.config as config
+from automations.db import execute_query
 
 _running = False
 _linky_task = None
