@@ -1,8 +1,9 @@
 import asyncio
 import logging
 
-import config
 import asyncpg
+
+import automations.config as config
 
 _db_pool = None
 
