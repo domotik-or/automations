@@ -35,7 +35,7 @@ def _set_loggers_level(config_loggers: dict, module_path: list):
 
             level = getattr(logging, lg_config)
             if this_module_path in logging.Logger.manager.loggerDict.keys():
-                logging.getLogger(lg_name).setLevel(level)
+                logging.getLogger(this_module_path).setLevel(level)
         else:
             raise Exception("incorrect type")
 
