@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class DomotikConfig:
+class DomioConfig:
     hostname: str
     port: int
 
@@ -11,6 +11,11 @@ class DomotikConfig:
 class GeneralConfig:
     dotenv_filename: str
 
+
+@dataclass
+class LinkyConfig:
+    apparent_power_alert: int
+    check_time: str
 
 @dataclass
 class MqttConfig:

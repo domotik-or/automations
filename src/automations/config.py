@@ -6,16 +6,18 @@ import tomllib
 
 from dotenv import load_dotenv
 
-from automations.typem import DomotikConfig
+from automations.typem import DomioConfig
 from automations.typem import GeneralConfig
+from automations.typem import LinkyConfig
 from automations.typem import MqttConfig
 from automations.typem import PeriodicityConfig
 from automations.typem import PostgresqlConfig
 from automations.typem import SecretsConfig
 from automations.typem import SmtpConfig
 
-domotik = None
+domio = None
 general = None
+linky = None
 loggers = {}
 mqtt = None
 periodicity = None
@@ -30,11 +32,14 @@ def read(config_filename: str):
     with open(config_file, "rb") as f:
         raw_config = tomllib.load(f)
 
+    global domio
+    domio = DomioConfig(**raw_config["domio"])
+
     global general
     general = GeneralConfig(**raw_config["general"])
 
-    global domotik
-    domotik = DomotikConfig(**raw_config["domotik"])
+    global linky
+    linky = LinkyConfig(**raw_config["linky"])
 
     global loggers
     loggers = raw_config["logger"]

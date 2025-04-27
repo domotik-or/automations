@@ -1,4 +1,8 @@
 import asyncio
+from datetime import date
+from datetime import datetime
+from datetime import time
+from datetime import timedelta
 from time import perf_counter
 import json
 import logging
@@ -12,6 +16,7 @@ from paho.mqtt.subscribeoptions import SubscribeOptions
 import automations.config as config
 from automations.db import execute_query
 
+_check_time = None
 _running = False
 _linky_task = None
 _mqtt_task = None
@@ -23,6 +28,7 @@ logger.setLevel(logging.INFO)
 
 
 def init():
+    global _check_time
     global _linky_task
     global _mqtt_task
     global _pressure_task
@@ -33,8 +39,10 @@ def init():
     _mqtt_task = asyncio.create_task(_task_mqtt())
     _pressure_task = asyncio.create_task(_task_pressure())
 
+    _check_time = datetime.strptime(config.linky.check_time, "%H:%M").time()
 
-async def send_email(subject: str, content: str):
+
+async def _send_email(subject: str, content: str):
     message = EmailMessage()
     message["From"] = config.secret_data.mail_from,
     message["To"] = config.secret_data.mail_to
@@ -80,8 +88,11 @@ async def _task_mqtt():
                     if payload["battery"] < 50:
                         logger.warning(f"{message.topic.value}: battery low")
                 elif message.topic.matches("home/doorbell/pressed"):
-                    await client.publish("home/doorbell/ring")
-                    await send_email("Ding dong !", "On sonne à la porte")
+                    await client.publish(
+                        "home/doorbell/ring",
+                        payload=json.dumps({"number": 5})
+                    )
+                    await _send_email("Ding dong !", "On sonne à la porte")
 
                     # store event in db
                     await execute_query(
@@ -97,6 +108,8 @@ async def _task_mqtt():
 async def _task_linky():
     logger.debug("linky task started")
 
+    power_alert = False
+
     start_time = perf_counter()
     try:
         while _running:
@@ -104,16 +117,44 @@ async def _task_linky():
                 start_time = perf_counter()
 
                 async with aiohttp.ClientSession() as session:
-                    url = f"http://{config.domotik.hostname}:{config.domotik.port}/linky"
+                    url = f"http://{config.domio.hostname}:{config.domio.port}/linky"
                     async with session.get(url) as resp:
                         if resp.status == 200:
                             json = await resp.json()
+                            sinst = json["data"]["sinsts"]
 
                             # store values in db
                             await execute_query(
                                 "INSERT INTO linky VALUES ($1, $2)",
-                                json["data"]["east"], json["data"]["sinsts"]
+                                json["data"]["east"], sinst
                             )
+
+                            # check apparent power
+                            check_datetime = datetime.combine(date.today(), _check_time)
+                            if abs(datetime.now() - check_datetime)  < timedelta(minutes=1):
+                                if sinst > config.linky.apparent_power_alert:
+                                    if not power_alert:
+                                        logger.warning("apparent power alert!")
+
+                                        # ring the bell once
+                                        async with aiomqtt.Client(
+                                            config.mqtt.hostname, config.mqtt.port,
+                                            protocol=aiomqtt.ProtocolVersion.V5
+                                        ) as client:
+                                            await client.publish(
+                                                "home/doorbell/ring",
+                                                payload=json.dumps({"number": 1})
+                                            )
+
+                                        # and send an email
+                                        await _send_email(
+                                            "Alerte consommation !",
+                                            "Consommation électrique inhabituelle"
+                                        )
+
+                                        power_alert = True
+                                else:
+                                    power_alert = False
                         else:
                             logger.debug(f"bad status ({resp.status}) when getting linky")
 
@@ -134,7 +175,7 @@ async def _task_pressure():
                 start_time = perf_counter()
 
                 async with aiohttp.ClientSession() as session:
-                    url = f"http://{config.domotik.hostname}:{config.domotik.port}/pressure"
+                    url = f"http://{config.domio.hostname}:{config.domio.port}/pressure"
                     async with session.get(url) as resp:
                         if resp.status == 200:
                             json = await resp.json()

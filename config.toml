@@ -5,13 +5,17 @@ dotenv_filename = "/home/domotik/.config/domotik/automations.env"
 hostname = "localhost"
 port = 1883
 
-[domotik]
+[domio]
 hostname = "localhost"
 port = 8100
 
 [smtp]
 hostname = "smtp.gmail.com"
 port = 587
+
+[linky]
+apparent_power_alert = 250
+check_time = "23:00"
 
 [logger]
 aiohttp = "WARNING"

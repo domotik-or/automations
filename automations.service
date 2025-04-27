@@ -2,7 +2,7 @@
 Description=Automation script
 StartLimitIntervalSec=300
 StartLimitBurst=5
-After=python3-domotik.service
+After=domio.service
 
 [Service]
 WorkingDirectory=/home/domotik
