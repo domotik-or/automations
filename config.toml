@@ -15,7 +15,7 @@ port = 587
 
 [linky]
 apparent_power_alert = 250
-check_time = "23:00"
+check_time = "23:30"
 
 [logger]
 aiohttp = "WARNING"

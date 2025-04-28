@@ -120,13 +120,13 @@ async def _task_linky():
                     url = f"http://{config.domio.hostname}:{config.domio.port}/linky"
                     async with session.get(url) as resp:
                         if resp.status == 200:
-                            json = await resp.json()
-                            sinst = json["data"]["sinsts"]
+                            data = (await resp.json())["data"]
+                            sinst = data["sinsts"]
 
                             # store values in db
                             await execute_query(
                                 "INSERT INTO linky VALUES ($1, $2)",
-                                json["data"]["east"], sinst
+                                data["east"], sinst
                             )
 
                             # check apparent power
@@ -178,8 +178,8 @@ async def _task_pressure():
                     url = f"http://{config.domio.hostname}:{config.domio.port}/pressure"
                     async with session.get(url) as resp:
                         if resp.status == 200:
-                            json = await resp.json()
-                            pressure = json["data"]["pressure"]
+                            data = (await resp.json())["data"]
+                            pressure = data["pressure"]
                             pressure /= 100.0  # convert to hPa
 
                             # store values in db
