@@ -2,6 +2,7 @@ import asyncio
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
+from functools import partial
 from time import perf_counter
 import json
 import logging
@@ -14,6 +15,7 @@ from paho.mqtt.subscribeoptions import SubscribeOptions
 
 import automations.config as config
 from automations.db import execute_query
+from automations.utils import done_callback
 
 _check_time = None
 _running = False
@@ -34,9 +36,15 @@ def init():
     global _running
 
     _running = True
+
     _linky_task = asyncio.create_task(_task_linky())
+    _linky_task.add_done_callback(partial(done_callback, logger))
+
     _mqtt_task = asyncio.create_task(_task_mqtt())
+    _mqtt_task.add_done_callback(partial(done_callback, logger))
+
     _pressure_task = asyncio.create_task(_task_pressure())
+    _pressure_task.add_done_callback(partial(done_callback, logger))
 
     _check_time = datetime.strptime(config.linky.check_time, "%H:%M").time()
 
@@ -204,17 +212,26 @@ async def close():
     _running = False
 
     if _linky_task is not None:
-        await _linky_task
+        try:
+            await _linky_task
+        except Exception:
+            # task exceptions are handled by the done callback
+            pass
         _linky_task = None
 
     if _mqtt_task is not None:
         try:
             _mqtt_task.cancel()
             await _mqtt_task
-        except asyncio.CancelledError:
+        except Exception:
+            # task exceptions are handled by the done callback
             pass
         _mqtt_task = None
 
     if _pressure_task is not None:
-        await _pressure_task
+        try:
+            await _pressure_task
+        except Exception:
+            # task exceptions are handled by the done callback
+            pass
         _pressure_task = None
