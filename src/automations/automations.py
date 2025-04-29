@@ -19,9 +19,9 @@ from automations.utils import done_callback
 
 _check_time = None
 _running = False
-_linky_task = None
-_mqtt_task = None
-_pressure_task = None
+_task_linky = None
+_task_mqtt = None
+_task_pressure = None
 
 # logger initial setup
 logger = logging.getLogger(__name__)
@@ -30,21 +30,24 @@ logger.setLevel(logging.INFO)
 
 def init():
     global _check_time
-    global _linky_task
-    global _mqtt_task
-    global _pressure_task
+    global _task_linky
+    global _task_mqtt
+    global _task_pressure
     global _running
 
     _running = True
 
-    _linky_task = asyncio.create_task(_task_linky())
-    _linky_task.add_done_callback(partial(done_callback, logger))
+    if _task_linky  is None:
+        _task_linky = asyncio.create_task(_linky_task())
+        _task_linky.add_done_callback(partial(done_callback, logger))
 
-    _mqtt_task = asyncio.create_task(_task_mqtt())
-    _mqtt_task.add_done_callback(partial(done_callback, logger))
+    if _task_mqtt  is None:
+        _task_mqtt = asyncio.create_task(_mqtt_task())
+        _task_mqtt.add_done_callback(partial(done_callback, logger))
 
-    _pressure_task = asyncio.create_task(_task_pressure())
-    _pressure_task.add_done_callback(partial(done_callback, logger))
+    if _task_pressure  is None:
+        _task_pressure = asyncio.create_task(_pressure_task())
+        _task_pressure.add_done_callback(partial(done_callback, logger))
 
     _check_time = datetime.strptime(config.linky.check_time, "%H:%M").time()
 
@@ -67,7 +70,7 @@ async def _send_email(subject: str, content: str):
         logger.error(f"{exc}")
 
 
-async def _task_mqtt():
+async def _mqtt_task():
     logger.debug("mqtt task started")
 
     async with aiomqtt.Client(
@@ -112,7 +115,7 @@ async def _task_mqtt():
     logger.debug("mqtt task stopped")
 
 
-async def _task_linky():
+async def _linky_task():
     logger.debug("linky task started")
 
     power_alert = False
@@ -172,7 +175,7 @@ async def _task_linky():
     logger.debug("pressure task stopped")
 
 
-async def _task_pressure():
+async def _pressure_task():
     logger.debug("pressure task started")
 
     start_time = perf_counter()
@@ -205,33 +208,33 @@ async def _task_pressure():
 
 async def close():
     global _running
-    global _linky_task
-    global _mqtt_task
-    global _pressure_task
+    global _task_linky
+    global _task_mqtt
+    global _task_pressure
 
     _running = False
 
-    if _linky_task is not None:
+    if _task_linky is not None:
         try:
-            await _linky_task
+            await _task_linky
         except Exception:
             # task exceptions are handled by the done callback
             pass
-        _linky_task = None
+        _task_linky = None
 
-    if _mqtt_task is not None:
+    if _task_mqtt is not None:
         try:
-            _mqtt_task.cancel()
-            await _mqtt_task
+            _task_mqtt.cancel()
+            await _task_mqtt
         except Exception:
             # task exceptions are handled by the done callback
             pass
-        _mqtt_task = None
+        _task_mqtt = None
 
-    if _pressure_task is not None:
+    if _task_pressure is not None:
         try:
-            await _pressure_task
+            await _task_pressure
         except Exception:
             # task exceptions are handled by the done callback
             pass
-        _pressure_task = None
+        _task_pressure = None
