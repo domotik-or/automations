@@ -1,7 +1,6 @@
 import asyncio
 from datetime import date
 from datetime import datetime
-from datetime import time
 from datetime import timedelta
 from time import perf_counter
 import json
@@ -131,7 +130,7 @@ async def _task_linky():
 
                             # check apparent power
                             check_datetime = datetime.combine(date.today(), _check_time)
-                            if abs(datetime.now() - check_datetime)  < timedelta(minutes=1):
+                            if abs(datetime.now() - check_datetime) < timedelta(minutes=1):
                                 if sinst > config.linky.apparent_power_alert:
                                     if not power_alert:
                                         logger.warning("apparent power alert!")
