@@ -9,8 +9,6 @@ import automations.config as config
 import automations.db as db
 import automations.automations as automations
 
-__version__ = "1.0.0"
-
 logger = logging.getLogger()
 handler = logging.StreamHandler(stream=sys.stdout)
 formatter = logging.Formatter("%(asctime)s %(module)s %(levelname)s %(message)s")
