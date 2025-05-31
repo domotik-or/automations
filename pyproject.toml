@@ -24,6 +24,7 @@ build-backend = "flit_core.buildapi"
 
 [project.scripts]
 automations = "automations.main:main"
+archive = "automations.archive:main"
 
 [tool.mypy]
 python_version = 3.11

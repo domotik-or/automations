@@ -86,17 +86,23 @@ async def _mqtt_task():
                     f"payload: {message.payload}"
                 )
                 if message.topic.matches("zigbee2mqtt/sensor/sonoff/snzb02p/#"):
+                    if message.payload is None:
+                        continue
+
                     payload = json.loads(message.payload.decode())
                     device = message.topic.value.split('/')[-1]
 
                     # store values in db
-                    await execute_query(
-                        "INSERT INTO sonoff_snzb02p VALUES ($1, $2, $3)",
-                        device, payload["humidity"], payload["temperature"]
-                    )
+                    try:
+                        await execute_query(
+                            "INSERT INTO sonoff_snzb02p VALUES ($1, $2, $3)",
+                            device, payload["humidity"], payload["temperature"]
+                        )
 
-                    if payload["battery"] < 50:
-                        logger.warning(f"{message.topic.value}: battery low")
+                        if payload["battery"] < 50:
+                            logger.warning(f"{message.topic.value}: battery low")
+                    except KeyError as exc:
+                        logger.error(f"incomplete data: missing {exc} key")
                 elif message.topic.matches("home/doorbell/pressed"):
                     await client.publish(
                         "home/doorbell/ring",

@@ -1,0 +1,2 @@
+# Location: /etc/cron.d/domotik.archive
+7 1 1 * * domotik /home/domotik/automations/scripts/archive.sh
