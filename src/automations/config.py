@@ -11,7 +11,7 @@ from automations.typem import LinkyConfig
 from automations.typem import MqttConfig
 from automations.typem import PeriodicityConfig
 from automations.typem import PostgresqlConfig
-from automations.typem import SecretsConfig
+from automations.typem import SecretConfig
 from automations.typem import SmtpConfig
 
 domio = None
@@ -21,7 +21,7 @@ loggers = {}
 mqtt = None
 periodicity = None
 postgresql = None
-secret_data = None
+secret = None
 smtp = None
 
 
@@ -55,15 +55,17 @@ def read(config_filename: str):
     global smtp
     smtp = SmtpConfig(**raw_config["smtp"])
 
-    # store secrets in memory
-    global secret_data
-    load_dotenv(general.dotenv_filename)
-    secret_data = SecretsConfig()
-    for v in (
-        "MAIL_FROM", "MAIL_TO", "PGPASSWORD", "SMTP_USERNAME", "SMTP_PASSWORD"
-    ):
+    # store secrets data in config class
+    global secret
+    load_dotenv(raw_config["secret"]["env_path"])
+    secret = SecretConfig()
+    for v in raw_config["secret"]["env_names"]:
         value = getenv(v)
         if value is None:
-            sys.stderr.write(f"Missing environment variable {v}\n")
-            sys.exit(1)
-        setattr(secret_data, v.lower(), value)
+            # not logging system configured yet!
+            sys.stderr.write(f"Missing environment variables {v}\n")
+        setattr(secret, v.lower(), value)
+
+
+if __name__ == "__main__":
+    read("config.toml")

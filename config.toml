@@ -1,5 +1,6 @@
-[general]
-dotenv_filename = "/home/domotik/.config/domotik/automations.env"
+[secret]
+env_path = "/home/domotik/.config/domotik/automations.env"
+env_names = ["MAIL_FROM", "MAIL_TO", "PGPASSWORD", "SMTP_USERNAME", "SMTP_PASSWORD"]
 
 [mqtt]
 hostname = "localhost"

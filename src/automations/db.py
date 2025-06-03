@@ -17,7 +17,7 @@ async def init():
 
     if _db_pool is None:
         dsn = (
-            f"postgres://{config.postgresql.username}:{config.secret_data.pgpassword}"
+            f"postgres://{config.postgresql.username}:{config.secret.pgpassword}"
             f"@{config.postgresql.hostname}:{config.postgresql.port}/{config.postgresql.databasename}"
         )
         _db_pool = await asyncpg.create_pool(dsn=dsn)

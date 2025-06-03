@@ -54,8 +54,8 @@ def init():
 
 async def _send_email(subject: str, content: str):
     message = EmailMessage()
-    message["From"] = config.secret_data.mail_from,
-    message["To"] = config.secret_data.mail_to
+    message["From"] = config.secret.mail_from,
+    message["To"] = config.secret.mail_to
     message["Subject"] = subject
     message.set_content(content)
     try:
@@ -63,8 +63,8 @@ async def _send_email(subject: str, content: str):
             message,
             hostname=config.smtp.hostname,
             port=config.smtp.port,
-            username=config.secret_data.smtp_username,
-            password=config.secret_data.smtp_password
+            username=config.secret.smtp_username,
+            password=config.secret.smtp_password
         )
     except Exception as exc:
         logger.error(f"{exc}")
