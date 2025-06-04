@@ -12,7 +12,7 @@ dependencies = [
     "asyncpg==0.30.0",
     "python-dotenv==1.1.0"
 ]
-license = "GPL-3.0-or-later"
+# license = "GPL-3.0-or-later"
 keywords = ["home automation", "automations"]
 
 [project.urls]
