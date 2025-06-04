@@ -6,7 +6,6 @@ import tomllib
 from dotenv import load_dotenv
 
 from automations.typem import DomioConfig
-from automations.typem import GeneralConfig
 from automations.typem import LinkyConfig
 from automations.typem import MqttConfig
 from automations.typem import PeriodicityConfig
@@ -15,7 +14,6 @@ from automations.typem import SecretConfig
 from automations.typem import SmtpConfig
 
 domio = None
-general = None
 linky = None
 loggers = {}
 mqtt = None
@@ -33,9 +31,6 @@ def read(config_filename: str):
 
     global domio
     domio = DomioConfig(**raw_config["domio"])
-
-    global general
-    general = GeneralConfig(**raw_config["general"])
 
     global linky
     linky = LinkyConfig(**raw_config["linky"])

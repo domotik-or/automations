@@ -8,11 +8,6 @@ class DomioConfig:
 
 
 @dataclass
-class GeneralConfig:
-    dotenv_filename: str
-
-
-@dataclass
 class LinkyConfig:
     apparent_power_alert: int
     check_time: str
