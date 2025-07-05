@@ -29,14 +29,6 @@ class PeriodicityConfig:
     pressure: int
 
 
-@dataclass
-class PostgresqlConfig:
-    hostname: str
-    port: int
-    username: str
-    databasename: str
-
-
 class SecretConfig:
     pass
 

@@ -10,7 +10,6 @@ from automations.typem import DomioConfig
 from automations.typem import LinkyConfig
 from automations.typem import MqttConfig
 from automations.typem import PeriodicityConfig
-from automations.typem import PostgresqlConfig
 from automations.typem import SecretConfig
 from automations.typem import SmtpConfig
 
@@ -20,7 +19,6 @@ linky = None
 loggers = {}
 mqtt = None
 periodicity = None
-postgresql = None
 secret = None
 smtp = None
 
@@ -48,9 +46,6 @@ def read(config_filename: str):
 
     global periodicity
     periodicity = PeriodicityConfig(**raw_config["periodicity"])
-
-    global postgresql
-    postgresql = PostgresqlConfig(**raw_config["postgresql"])
 
     global smtp
     smtp = SmtpConfig(**raw_config["smtp"])
