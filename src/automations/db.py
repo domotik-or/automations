@@ -81,7 +81,7 @@ async def execute_query(query: str, *args):
             logger.error(f"error while executing query ({exc})")
 
 
-async def close_db():
+async def close():
     global _conn
 
     if _conn is not None:
@@ -112,11 +112,7 @@ async def run(config_filename: str):
             "sejour", 50.0, 21.0
         )
     finally:
-        await close_db()
-
-
-async def close():
-    await close_db()
+        await close()
 
 
 if __name__ == "__main__":
