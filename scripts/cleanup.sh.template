@@ -1,3 +1,0 @@
-# Copy this file to cleanup.sh and change the user's password
-export PGPASSWORD='XXXXXXXX'
-/usr/bin/psql domotiq < /home/domotik/automations/utils/cleanup.sql

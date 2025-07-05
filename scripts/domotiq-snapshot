@@ -1,0 +1,2 @@
+# Location: /etc/cron.d/domotik-snapshot
+7 1 1 * * domotik /home/domotik/automations/scripts/snapshot.sh

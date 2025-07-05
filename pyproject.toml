@@ -9,7 +9,7 @@ dependencies = [
     "aiohttp==3.11.18",
     "aiomqtt==2.3.2",
     "aiosmtplib==4.0.0",
-    "aiosqlite=="0.21.0"
+    "aiosqlite=="0.21.0",
     "python-dotenv==1.1.0"
 ]
 # license = "GPL-3.0-or-later"
@@ -24,7 +24,7 @@ build-backend = "flit_core.buildapi"
 
 [project.scripts]
 automations = "automations.main:main"
-archive = "automations.archive:main"
+snapshot = "automations.snapshot:main"
 
 [tool.mypy]
 python_version = 3.11

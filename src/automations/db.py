@@ -65,9 +65,8 @@ async def create_tables():
 async def init():
     global _conn
 
-    _conn = await aiosqlite.connect(config.database.path, autocommit=True)
-
     try:
+        _conn = await aiosqlite.connect(config.database.path, autocommit=True)
         await create_tables()
     except Sqlite3Error as exc:
         logger.error(f"error while creating tables ({exc})")
