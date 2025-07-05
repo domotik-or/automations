@@ -2,6 +2,11 @@ from dataclasses import dataclass
 
 
 @dataclass
+class DatabaseConfig:
+    path: str
+
+
+@dataclass
 class DomioConfig:
     hostname: str
     port: int

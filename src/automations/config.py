@@ -5,6 +5,7 @@ import tomllib
 
 from dotenv import load_dotenv
 
+from automations.typem import DatabaseConfig
 from automations.typem import DomioConfig
 from automations.typem import LinkyConfig
 from automations.typem import MqttConfig
@@ -13,6 +14,7 @@ from automations.typem import PostgresqlConfig
 from automations.typem import SecretConfig
 from automations.typem import SmtpConfig
 
+database = None
 domio = None
 linky = None
 loggers = {}
@@ -28,6 +30,9 @@ def read(config_filename: str):
 
     with open(config_file, "rb") as f:
         raw_config = tomllib.load(f)
+
+    global database
+    database = DatabaseConfig(**raw_config["database"])
 
     global domio
     domio = DomioConfig(**raw_config["domio"])

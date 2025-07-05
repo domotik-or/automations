@@ -1,40 +1,92 @@
 import asyncio
 import logging
 
-import asyncpg
+import aiosqlite
+from sqlite3 import Error as Sqlite3Error
 
 import automations.config as config
 
-_db_pool = None
+_conn = None
 
 # logger initial setup
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-async def init():
-    global _db_pool
+async def create_tables():
+    await _conn.execute(
+        "CREATE TABLE IF NOT EXISTS linky ("
+        "    east INTEGER,"
+        "    sinst INTEGER,"
+        "    timestamp TIMESTAMP(1) DEFAULT CURRENT_TIMESTAMP"
+        ");"
+    )
 
-    if _db_pool is None:
-        dsn = (
-            f"postgres://{config.postgresql.username}:{config.secret.pgpassword}"
-            f"@{config.postgresql.hostname}:{config.postgresql.port}/{config.postgresql.databasename}"
-        )
-        _db_pool = await asyncpg.create_pool(dsn=dsn)
+    await _conn.execute(
+        "CREATE TABLE IF NOT EXISTS linky_snapshot ("
+        "    east INTEGER,"
+        "    timestamp TIMESTAMP(1) DEFAULT CURRENT_TIMESTAMP"
+        ");"
+    )
+
+    await _conn.execute(
+        "CREATE TABLE IF NOT EXISTS on_off ("
+        "    device VARCHAR(30),"
+        "    state boolean,"
+        "    timestamp TIMESTAMP(1) DEFAULT CURRENT_TIMESTAMP"
+        ");"
+    )
+
+    await _conn.execute(
+        "CREATE TABLE IF NOT EXISTS pressure ("
+        "    pressure REAL,"
+        "    timestamp TIMESTAMP(1) DEFAULT CURRENT_TIMESTAMP"
+        ");"
+    )
+
+    await _conn.execute(
+        "CREATE TABLE IF NOT EXISTS sonoff_snzb02p ("
+        "    device VARCHAR(30),"
+        "    humidity REAL,"
+        "    temperature REAL,"
+        "    timestamp TIMESTAMP(1) DEFAULT CURRENT_TIMESTAMP"
+        ");"
+    )
+
+    await _conn.execute(
+        "CREATE TABLE IF NOT EXISTS outdoor ("
+        "    humidity REAL,"
+        "    temperature REAL,"
+        "    timestamp TIMESTAMP(1) DEFAULT CURRENT_TIMESTAMP"
+        ");"
+    )
+
+
+async def init():
+    global _conn
+
+    _conn = await aiosqlite.connect(config.database.path, autocommit=True)
+
+    try:
+        await create_tables()
+    except Sqlite3Error as exc:
+        logger.error(f"error while creating tables ({exc})")
 
 
 async def execute_query(query: str, *args):
-    if _db_pool is not None:
-        async with _db_pool.acquire() as conn:  # type: ignore[union-attr]
-            await conn.execute(query, *args)
+    if _conn is not None:
+        try:
+            await _conn.execute(query, args)
+        except Sqlite3Error as exc:
+            logger.error(f"error while executing query ({exc})")
 
 
 async def close_db():
-    global _db_pool
+    global _conn
 
-    if _db_pool is not None:
-        await _db_pool.close()
-        _db_pool = None
+    if _conn is not None:
+        await _conn.close()
+        _conn = None
 
 
 async def run(config_filename: str):
@@ -42,22 +94,25 @@ async def run(config_filename: str):
 
     await init()
 
-    await execute_query(
-        "INSERT INTO on_off VALUES ($1, $2)", "doorbell", True
-    )
+    try:
+        await execute_query(
+            "INSERT INTO on_off(device, state) VALUES (?, ?)", "doorbell", True
+        )
 
-    await execute_query(
-        "INSERT INTO linky VALUES ($1, $2)", 1000, 2000
-    )
+        await execute_query(
+            "INSERT INTO linky(east, sinst) VALUES (?, ?)", 1000, 2000
+        )
 
-    await execute_query(
-        "INSERT INTO pressure VALUES ($1)", 1013.25
-    )
+        await execute_query(
+            "INSERT INTO pressure(pressure) VALUES (?)", 1013.25
+        )
 
-    await execute_query(
-        "INSERT INTO sonoff_snzb02p VALUES ($1, $2, $3)",
-        "sejour", 50.0, 21.0
-    )
+        await execute_query(
+            "INSERT INTO sonoff_snzb02p(device, humidity, temperature) VALUES (?, ?, ?)",
+            "sejour", 50.0, 21.0
+        )
+    finally:
+        await close_db()
 
 
 async def close():

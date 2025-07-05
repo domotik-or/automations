@@ -2,6 +2,9 @@
 env_path = "/home/domotik/.config/domotik/automations.env"
 env_names = ["MAIL_FROM", "MAIL_TO", "PGPASSWORD", "SMTP_USERNAME", "SMTP_PASSWORD"]
 
+[database]
+path = "/home/domotik/domotik.db"
+
 [mqtt]
 hostname = "localhost"
 port = 1883

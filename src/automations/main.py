@@ -7,7 +7,7 @@ import sys
 
 import automations.config as config
 import automations.db as db
-import automations.automations as automations
+import automations.tasks as tasks
 
 logger = logging.getLogger()
 handler = logging.StreamHandler(stream=sys.stdout)
@@ -42,7 +42,7 @@ async def init():
     _set_loggers_level(config.loggers, [])
 
     await db.init()
-    automations.init()
+    tasks.init()
 
 
 async def run(config_filename: str):
@@ -55,7 +55,7 @@ async def run(config_filename: str):
 
 
 async def close():
-    await automations.close()
+    await tasks.close()
     await db.close()
 
 

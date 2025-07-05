@@ -95,7 +95,7 @@ async def _mqtt_task():
                     # store values in db
                     try:
                         await execute_query(
-                            "INSERT INTO sonoff_snzb02p VALUES ($1, $2, $3)",
+                            "INSERT INTO sonoff_snzb02p VALUES (?, ?, ?)",
                             device, payload["humidity"], payload["temperature"]
                         )
 
@@ -112,7 +112,7 @@ async def _mqtt_task():
 
                     # store event in db
                     await execute_query(
-                        "INSERT INTO on_off VALUES ($1, $2)", "doorbell", True
+                        "INSERT INTO on_off VALUES (?, ?)", "doorbell", True
                     )
 
         except (asyncio.CancelledError, KeyboardInterrupt):
@@ -141,7 +141,7 @@ async def _linky_task():
 
                             # store values in db
                             await execute_query(
-                                "INSERT INTO linky VALUES ($1, $2)",
+                                "INSERT INTO linky VALUES (?, ?)",
                                 data["east"], sinst
                             )
 
@@ -200,7 +200,7 @@ async def _pressure_task():
 
                             # store values in db
                             await execute_query(
-                                "INSERT INTO pressure VALUES ($1)", pressure
+                                "INSERT INTO pressure VALUES (?)", pressure
                             )
                         else:
                             logger.debug(f"bad status ({resp.status}) when getting pressure")
