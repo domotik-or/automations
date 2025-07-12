@@ -45,16 +45,8 @@ async def create_tables():
     )
 
     await _conn.execute(
-        "CREATE TABLE IF NOT EXISTS sonoff_snzb02p ("
+        "CREATE TABLE IF NOT EXISTS temperature_humidity ("
         "    device VARCHAR(30),"
-        "    humidity REAL,"
-        "    temperature REAL,"
-        "    timestamp TIMESTAMP(1) DEFAULT CURRENT_TIMESTAMP"
-        ");"
-    )
-
-    await _conn.execute(
-        "CREATE TABLE IF NOT EXISTS outdoor ("
         "    humidity REAL,"
         "    temperature REAL,"
         "    timestamp TIMESTAMP(1) DEFAULT CURRENT_TIMESTAMP"
@@ -107,7 +99,7 @@ async def run(config_filename: str):
         )
 
         await execute_query(
-            "INSERT INTO sonoff_snzb02p(device, humidity, temperature) VALUES (?, ?, ?)",
+            "INSERT INTO temperature_humidity(device, humidity, temperature) VALUES (?, ?, ?)",
             "sejour", 50.0, 21.0
         )
     finally:

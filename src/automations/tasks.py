@@ -95,14 +95,15 @@ async def _mqtt_task():
                     # store values in db
                     try:
                         await execute_query(
-                            "INSERT INTO sonoff_snzb02p VALUES (?, ?, ?)",
+                            "INSERT INTO temperature_humidity "
+                            "(device, humidity, temperature) VALUES (?, ?, ?)",
                             device, payload["humidity"], payload["temperature"]
                         )
 
                         if payload["battery"] < 50:
                             logger.warning(f"{message.topic.value}: battery low")
                     except KeyError as exc:
-                        logger.error(f"incomplete data: missing {exc} key")
+                        logger.debug(f"incomplete data: missing {exc} key")
                 elif message.topic.matches("home/doorbell/pressed"):
                     await client.publish(
                         "home/doorbell/ring",
@@ -112,7 +113,8 @@ async def _mqtt_task():
 
                     # store event in db
                     await execute_query(
-                        "INSERT INTO on_off VALUES (?, ?)", "doorbell", True
+                        "INSERT INTO on_off(device, state) VALUES (?, ?)",
+                        "doorbell", True
                     )
 
         except (asyncio.CancelledError, KeyboardInterrupt):
@@ -141,7 +143,7 @@ async def _linky_task():
 
                             # store values in db
                             await execute_query(
-                                "INSERT INTO linky VALUES (?, ?)",
+                                "INSERT INTO linky(east, sinst) VALUES (?, ?)",
                                 data["east"], sinst
                             )
 
@@ -178,7 +180,7 @@ async def _linky_task():
     except (asyncio.CancelledError, KeyboardInterrupt):
         pass
 
-    logger.debug("pressure task stopped")
+    logger.debug("linky task stopped")
 
 
 async def _pressure_task():
@@ -200,7 +202,7 @@ async def _pressure_task():
 
                             # store values in db
                             await execute_query(
-                                "INSERT INTO pressure VALUES (?)", pressure
+                                "INSERT INTO pressure(pressure) VALUES (?)", pressure
                             )
                         else:
                             logger.debug(f"bad status ({resp.status}) when getting pressure")

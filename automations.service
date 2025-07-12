@@ -2,7 +2,7 @@
 Description=Automation script
 StartLimitIntervalSec=300
 StartLimitBurst=5
-After=domio.service
+After=domio.service mosquitto.service
 
 [Service]
 WorkingDirectory=/home/domotik

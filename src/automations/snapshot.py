@@ -26,7 +26,7 @@ async def run(config_filename: str):
 
                     # store values in db
                     await db.execute_query(
-                        "INSERT INTO linky_snapshot VALUES (?)", data["east"]
+                        "INSERT INTO linky_snapshot(east) VALUES (?)", data["east"]
                     )
     finally:
         await db.close()

@@ -1,9 +1,9 @@
 [secret]
 env_path = "/home/domotik/.config/domotik/automations.env"
-env_names = ["MAIL_FROM", "MAIL_TO", "PGPASSWORD", "SMTP_USERNAME", "SMTP_PASSWORD"]
+env_names = ["MAIL_FROM", "MAIL_TO", "SMTP_USERNAME", "SMTP_PASSWORD"]
 
 [database]
-path = "/home/domotik/domotik.db"
+path = "/home/domotik/database/domotik.db"
 
 [mqtt]
 hostname = "localhost"
@@ -23,9 +23,11 @@ check_time = "23:30"
 
 [logger]
 aiohttp = "WARNING"
+aiosqlite = "WARNING"
 
 [logger.automations]
-automations = "INFO"
+tasks = "INFO"
+db = "INFO"
 
 [periodicity]
 pressure = 600
