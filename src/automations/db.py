@@ -32,7 +32,7 @@ async def create_tables():
     await _conn.execute(
         "CREATE TABLE IF NOT EXISTS on_off ("
         "    device VARCHAR(30),"
-        "    state boolean,"
+        "    state BOOLEAN,"
         "    timestamp TIMESTAMP(1) DEFAULT (STRFTIME('%s', 'NOW'))"
         ");"
     )
