@@ -18,14 +18,14 @@ async def create_tables():
         "CREATE TABLE IF NOT EXISTS linky ("
         "    east INTEGER,"
         "    sinst INTEGER,"
-        "    timestamp TIMESTAMP(1) DEFAULT CURRENT_TIMESTAMP"
+        "    timestamp TIMESTAMP(1) DEFAULT (STRFTIME('%s', 'NOW'))"
         ");"
     )
 
     await _conn.execute(
         "CREATE TABLE IF NOT EXISTS linky_snapshot ("
         "    east INTEGER,"
-        "    timestamp TIMESTAMP(1) DEFAULT CURRENT_TIMESTAMP"
+        "    timestamp TIMESTAMP(1) DEFAULT (STRFTIME('%s', 'NOW'))"
         ");"
     )
 
@@ -33,14 +33,14 @@ async def create_tables():
         "CREATE TABLE IF NOT EXISTS on_off ("
         "    device VARCHAR(30),"
         "    state boolean,"
-        "    timestamp TIMESTAMP(1) DEFAULT CURRENT_TIMESTAMP"
+        "    timestamp TIMESTAMP(1) DEFAULT (STRFTIME('%s', 'NOW'))"
         ");"
     )
 
     await _conn.execute(
         "CREATE TABLE IF NOT EXISTS pressure ("
         "    pressure REAL,"
-        "    timestamp TIMESTAMP(1) DEFAULT CURRENT_TIMESTAMP"
+        "    timestamp TIMESTAMP(1) DEFAULT (STRFTIME('%s', 'NOW'))"
         ");"
     )
 
@@ -49,7 +49,7 @@ async def create_tables():
         "    device VARCHAR(30),"
         "    humidity REAL,"
         "    temperature REAL,"
-        "    timestamp TIMESTAMP(1) DEFAULT CURRENT_TIMESTAMP"
+        "    timestamp TIMESTAMP(1) DEFAULT (STRFTIME('%s', 'NOW'))"
         ");"
     )
 
