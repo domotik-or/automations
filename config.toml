@@ -30,5 +30,6 @@ tasks = "INFO"
 db = "INFO"
 
 [periodicity]
+outdoor = 300
 pressure = 600
 linky = 60

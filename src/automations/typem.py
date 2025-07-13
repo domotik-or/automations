@@ -26,6 +26,7 @@ class MqttConfig:
 @dataclass
 class PeriodicityConfig:
     linky: int
+    outdoor: int
     pressure: int
 
 

@@ -21,6 +21,7 @@ _check_time = None
 _running = False
 _task_linky = None
 _task_mqtt = None
+_task_outdoor = None
 _task_pressure = None
 
 # logger initial setup
@@ -32,6 +33,7 @@ def init():
     global _check_time
     global _task_linky
     global _task_mqtt
+    global _task_outdoor
     global _task_pressure
     global _running
 
@@ -44,6 +46,10 @@ def init():
     if _task_mqtt  is None:
         _task_mqtt = asyncio.create_task(_mqtt_task())
         _task_mqtt.add_done_callback(partial(done_callback, logger))
+
+    if _task_outdoor  is None:
+        _task_outdoor = asyncio.create_task(_outdoor_task())
+        _task_outdoor.add_done_callback(partial(done_callback, logger))
 
     if _task_pressure  is None:
         _task_pressure = asyncio.create_task(_pressure_task())
@@ -183,6 +189,40 @@ async def _linky_task():
     logger.debug("linky task stopped")
 
 
+async def _outdoor_task():
+    logger.debug("outdoor task started")
+
+    start_time = perf_counter()
+    try:
+        while _running:
+            if perf_counter() - start_time >= config.periodicity.outdoor:
+                start_time = perf_counter()
+
+                async with aiohttp.ClientSession() as session:
+                    url = f"http://{config.domio.hostname}:{config.domio.port}/outdoor"
+                    async with session.get(url) as resp:
+                        if resp.status == 200:
+                            data = (await resp.json())["data"]
+                            humidity = data["humidity"]
+                            temperature = data["temperature"]
+
+                            # store values in db
+                            await execute_query(
+                                "INSERT INTO temperature_humidity(humidity, temperature) VALUES (?, ?)",
+                                humidity, temperature
+                            )
+                        else:
+                            logger.debug(
+                                f"bad status ({resp.status}) when getting outdoor data"
+                            )
+
+            await asyncio.sleep(1)
+    except (asyncio.CancelledError, KeyboardInterrupt):
+        pass
+
+    logger.debug("outdoor task stopped")
+
+
 async def _pressure_task():
     logger.debug("pressure task started")
 
@@ -218,6 +258,7 @@ async def close():
     global _running
     global _task_linky
     global _task_mqtt
+    global _task_outdoor
     global _task_pressure
 
     _running = False
@@ -238,6 +279,14 @@ async def close():
             # task exceptions are handled by the done callback
             pass
         _task_mqtt = None
+
+    if _task_outdoor is not None:
+        try:
+            await _task_outdoor
+        except Exception:
+            # task exceptions are handled by the done callback
+            pass
+        _task_outdoor = None
 
     if _task_pressure is not None:
         try:
