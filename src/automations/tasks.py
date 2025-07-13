@@ -208,7 +208,10 @@ async def _outdoor_task():
 
                             # store values in db
                             await execute_query(
-                                "INSERT INTO temperature_humidity(humidity, temperature) VALUES (?, ?)",
+                                (
+                                    "INSERT INTO temperature_humidity(device, humidity, temperature) "
+                                    "VALUES ('outdoor', ?, ?)"
+                                ),
                                 humidity, temperature
                             )
                         else:
