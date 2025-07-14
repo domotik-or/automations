@@ -6,7 +6,7 @@ After=domio.service mosquitto.service
 
 [Service]
 WorkingDirectory=/home/domotik
-# Environment="PYTHONPATH="
+# Environment=
 ExecStart=/home/domotik/.local/bin/automations -c /home/domotik/.config/domotik/automations.toml
 User=domotik
 Group=domotik
