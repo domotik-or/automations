@@ -8,6 +8,7 @@ import sys
 import automations.config as config
 import automations.db as db
 import automations.tasks as tasks
+from automations.utils import set_loggers_level
 
 logger = logging.getLogger()
 handler = logging.StreamHandler(stream=sys.stdout)
@@ -17,29 +18,8 @@ logger.addHandler(handler)
 logger.setLevel(logging.DEBUG)
 
 
-def _set_loggers_level(config_loggers: dict, module_path: list):
-    # set log level of modules logger
-    for lg_name, lg_config in config_loggers.items():
-        if isinstance(lg_config, dict):
-            module_path.append(lg_name)
-            _set_loggers_level(lg_config, module_path)
-        elif isinstance(lg_config, str):
-            this_module_path = '.'.join(module_path + [lg_name])
-            try:
-                importlib.import_module(this_module_path)
-            except ModuleNotFoundError:
-                logger.warning(f"module {this_module_path} not found")
-                continue
-
-            level = getattr(logging, lg_config)
-            if this_module_path in logging.Logger.manager.loggerDict.keys():
-                logging.getLogger(this_module_path).setLevel(level)
-        else:
-            raise Exception("incorrect type")
-
-
 async def init():
-    _set_loggers_level(config.loggers, [])
+    set_loggers_level(config.loggers)
 
     await db.init()
     tasks.init()

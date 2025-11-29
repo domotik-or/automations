@@ -21,13 +21,21 @@ port = 587
 apparent_power_alert = 250
 check_time = "23:30"
 
-[logger]
-aiohttp = "WARNING"
-aiosqlite = "WARNING"
+[[logger]]
+module = "aiohttp"
+level = "WARNING"
 
-[logger.automations]
-tasks = "INFO"
-db = "INFO"
+[[logger]]
+module = "aiosqlite"
+level = "WARNING"
+
+[[logger]]
+module = "automations.tasks"
+level = "INFO"
+
+[[logger]]
+module = "automations.db"
+level = "INFO"
 
 [periodicity]
 outdoor = 300
