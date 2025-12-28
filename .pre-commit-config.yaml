@@ -2,20 +2,22 @@
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v6.0.0
     hooks:
     -   id: check-ast
     -   id: check-merge-conflict
     -   id: check-symlinks
     -   id: check-toml
     -   id: debug-statements
+    -   id: end-of-file-fixer
     -   id: trailing-whitespace
 -   repo: https://github.com/PyCQA/flake8.git
-    rev: 7.0.0
+    rev: 7.3.0
     hooks:
     -   id: flake8
         args: ['--ignore=E501,F821,F841,W503,W504,W605']
+        additional_dependencies: [pep8-naming]
 -   repo: https://github.com/PyCQA/doc8
-    rev: v1.1.1
+    rev: v2.0.0
     hooks:
     -   id: doc8
