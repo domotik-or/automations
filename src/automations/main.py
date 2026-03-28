@@ -1,6 +1,5 @@
 import argparse
 import asyncio
-import importlib
 import logging
 import signal
 import sys
@@ -8,19 +7,16 @@ import sys
 import automations.config as config
 import automations.db as db
 import automations.tasks as tasks
-from automations.utils import set_loggers_level
+from automations.logger import close as logger_close
+from automations.logger import init as logger_init
 
-logger = logging.getLogger()
-handler = logging.StreamHandler(stream=sys.stdout)
-formatter = logging.Formatter("%(asctime)s %(module)s %(levelname)s %(message)s")
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(logging.DEBUG)
+# logger initial setup
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 async def init():
-    set_loggers_level(config.loggers)
-
+    logger_init(config.loggers)
     await db.init()
     tasks.init()
 
@@ -29,6 +25,7 @@ async def run(config_filename: str):
     config.read(config_filename)
 
     await init()
+    logger_close()
 
     while True:
         await asyncio.sleep(60)
